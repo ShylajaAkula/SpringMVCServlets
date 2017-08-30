@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+    xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+     xmlns:mvc="http://www.springframework.org/schema/mvc"
+     xmlns:tx="http://www.springframework.org/schema/tx"
+      xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-4.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.1.xsd" >
+	
+	<security:global-method-security secured-annotations="enabled"/> 
+	
+    <security:http>
+ 
+ <security:intercept-url pattern="/login*" access="permitAll"/>
+ <security:intercept-url pattern="/regisHome.do" access="permitAll"/>
+ <security:intercept-url pattern="/registerbody.do*" access="permitAll"/>
+ <!-- <security:intercept-url pattern="/**" access="isAuthenticated()"/>   -->
+
+      <security:csrf disabled="true"/>
+
+       <security:form-login 
+
+	       login-page="/loginDisplay.do" 
+
+	       login-processing-url="/loginProcessingUrl.do"
+
+	       username-parameter="username"
+
+	       password-parameter="password"
+
+	       default-target-url="/success.do"
+
+	       authentication-failure-url="/loginDisplay.do" />
+	       
+	        <security:logout
+	      logout-url="/logout.do"
+	        success-handler-ref="ourLogoutSuccessHandler"
+	      invalidate-session="true"
+	  />       
+	       
+
+   </security:http>
+
+  <security:authentication-manager>
+  
+
+      <security:authentication-provider user-service-ref="userDetailsServiceImpl">
+ 
+      <!--  <security:user-service>
+
+          <security:user name="abc" authorities="ROLE_ADMIN" password="bca"/>
+          <security:user name="shylu" authorities="USER" password="shylu"/>
+          
+
+        </security:user-service>  -->
+ 
+      
+      </security:authentication-provider> 
+
+   </security:authentication-manager>
+
+   
+ 
+ <bean id="basicDataSource"  class="org.apache.commons.dbcp2.BasicDataSource">
+ <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+ <property name="url" value="jdbc:mysql://localhost:3306/slokam"></property>
+ <property name="username" value="root"></property>
+ <property name="password" value="sql"></property>
+ </bean>
+  <bean id="sf" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+ <property name="dataSource" ref="basicDataSource"></property>
+  <property name="hibernateProperties">
+  <props>
+  <prop  key="hibernate.show_sql">true</prop>
+  <prop  key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+  </props></property>
+   
+ <property name="packagesToScan" value="com.pojo"></property>
+ </bean>
+ <bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+ <property name="sessionFactory" ref="sf"></property>
+ </bean>
+ <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+ <property name="sessionFactory" ref="sf"></property>
+ </bean>
+ 
+ <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+ <property name="prefix" value="WEB-INF/Jsp/"></property>
+ <property name="suffix" value=".jsp"></property>
+ </bean>
+ 
+ <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+ </bean>
+ <context:component-scan base-package="com"></context:component-scan>
+ <mvc:annotation-driven></mvc:annotation-driven>
+ <tx:annotation-driven/>
+ 
+ <aop:aspectj-autoproxy/>
+</beans>	
